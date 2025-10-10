@@ -1,0 +1,11 @@
+Flask
+google-generativeai
+python-dotenv
+requests
+openai
+reportlab 
+langgraph
+langchain
+clerk-backend-api
+gunicorn
+supabase
