@@ -5,119 +5,136 @@ import re
 import traceback
 from datetime import datetime
 from pathlib import Path
-from flask import Flask, request, jsonify, redirect, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 import requests
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from PIL import Image
+from werkzeug.utils import secure_filename
+from functools import wraps
 
 # load .env if present
 load_dotenv()
 
-# Optional 3rd-party libs (Gemini) — only configure if key present
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=GEMINI_API_KEY)
-    except Exception as e:
-        print("Warning: google.generativeai not configured:", e)
-
-# Email creds (optional)
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-APP_PASSWORD = os.getenv("APP_PASSWORD")
-
-# Clerk secret if you verify sessions server-side (optional)
-CLERK_SECRET = os.getenv("CLERK_SECRET_KEY")
-# if you have clerk_backend_api.py and Clerk implementation, import it
-try:
-    from clerk_backend_api import Clerk
-    clerk = Clerk(CLERK_SECRET) if CLERK_SECRET else None
-except Exception:
-    clerk = None
-    print("Clerk backend API not available or CLERK_SECRET_KEY missing. Protected endpoints will require token only (no server verify).")
-
-# Upload folder (Cloud Run ephemeral)
+# ---------- Config & globals ----------
 UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/tmp/uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Firebase hosting URL (for redirects/CORS). Set this in Cloud Run env vars.
 FIREBASE_HOSTING_URL = os.getenv("FIREBASE_HOSTING_URL", "").rstrip("/")
+CLOUD_RUN_URL = os.getenv("CLOUD_RUN_URL", "").rstrip("/")
 
-# Optional Cloud Run URL (add to CORS)
-CLOUD_RUN_URL = os.getenv("CLOUD_RUN_URL", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+APP_PASSWORD = os.getenv("APP_PASSWORD")
+CLERK_SECRET = os.getenv("CLERK_SECRET_KEY")
 
 app = Flask(__name__)
 
-# CORS: allow firebase host + localhost for testing. Avoid "*" in production.
+# CORS setup: prefer explicit origins; fallback to wildcard for dev
 origins = []
 if FIREBASE_HOSTING_URL:
     origins.append(FIREBASE_HOSTING_URL)
-origins.extend(["http://localhost:5000", "http://127.0.0.1:5000"])
 if CLOUD_RUN_URL:
     origins.append(CLOUD_RUN_URL)
-# during rapid testing you can use ["*"], but prefer explicit origins
-CORS(app, origins=origins or ["*"])
+origins.extend(["http://localhost:5000", "http://127.0.0.1:5000"])
+if origins:
+    CORS(app, origins=origins)
+else:
+    CORS(app)  # allow all (dev)
 
+# Try to import and configure google.generativeai if key present
+genai = None
+if GEMINI_API_KEY:
+    try:
+        import google.generativeai as _genai
+        _genai.configure(api_key=GEMINI_API_KEY)
+        genai = _genai
+    except Exception as e:
+        print("Warning: google.generativeai not available or failed to configure:", e)
+        genai = None
 
-# ---------------- Utility & helpers (kept from your original code, slightly hardened) ----------------
+# Clerk server-side optional import (if you have it)
+clerk = None
+if CLERK_SECRET:
+    try:
+        from clerk_backend_api import Clerk
+        clerk = Clerk(CLERK_SECRET)
+    except Exception as e:
+        print("Warning: clerk backend module not available or CLERK_SECRET invalid:", e)
+        clerk = None
 
+# ---------- Helpers ----------
 def safe_float(val):
     try:
-        return float(val) if val and str(val).strip() != '' else 0.0
+        return float(val) if (val is not None and str(val).strip() != "") else 0.0
     except Exception:
         return 0.0
 
-# Transcript using HuggingFace Whisper endpoint (from your original)
+def save_uploaded_file(file_storage, folder=UPLOAD_FOLDER):
+    filename = secure_filename(file_storage.filename or f"file_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}")
+    path = os.path.join(folder, filename)
+    file_storage.save(path)
+    return path
+
+# Transcription via HuggingFace Whisper inference
 def get_transcript(audio_path):
     try:
-        hf_key = os.getenv("HUGGINGFACE_API_KEY")
+        hf_key = HUGGINGFACE_API_KEY
         if not hf_key:
             return "Error: Missing HUGGINGFACE_API_KEY"
         headers = {"Authorization": f"Bearer {hf_key}", "Content-Type": "audio/mpeg"}
-        with open(audio_path, "rb") as audio_file:
-            audio_data = audio_file.read()
+        with open(audio_path, "rb") as fh:
+            audio_data = fh.read()
         resp = requests.post(
             "https://api-inference.huggingface.co/models/openai/whisper-large-v3-turbo",
             headers=headers,
             data=audio_data,
-            timeout=60
+            timeout=120
         )
         if resp.status_code == 200:
             rj = resp.json()
             return rj.get("text", "No transcription found")
         else:
-            return f"Error: Failed to transcribe, status {resp.status_code}: {resp.text}"
+            return f"Error: Transcription failed ({resp.status_code}) - {resp.text[:400]}"
     except Exception as e:
         return f"Error: Exception in transcription: {str(e)}"
 
-# Invoice generation using Gemini (or fallback)
+# Generate invoice using Gemini (if available) else fallback
 def generate_invoice(transcript):
     try:
-        if GEMINI_API_KEY:
-            # Use Gemini model (your original prompt). Keep it simple here.
-            model = genai.GenerativeModel("gemini-2.0-flash")
-            prompt = f"Generate valid JSON invoice from the following text. Output must be JSON only.\n\n{transcript}"
-            response = model.generate_content(prompt)
-            if response and response.candidates:
-                text = response.candidates[0].content.parts[0].text.strip()
-                text = re.sub(r"```json|```", "", text).strip()
-                try:
-                    return json.loads(text)
-                except Exception:
-                    return {"error": "Invalid JSON from LLM", "raw": text}
-            return {"error": "No response from LLM"}
+        if genai:
+            # Simple prompt; ensure output is JSON only
+            prompt = (
+                "You are an assistant that MUST output valid JSON only. "
+                "From the following text, extract invoice data and output a JSON object with keys: invoice (containing invoiceNumber, issueDate, dueDate, issuer_info, client, serviceDetails (list of {description,quantity,unitPrice,totalPrice}), shipping_cost, vatAmount, taxAmount, totalAmount, paymentMethod, endnote). "
+                "If any field is missing, provide reasonable placeholders or empty strings/numbers.\n\n"
+                f"Input: {transcript}\n\nJSON:"
+            )
+            try:
+                model = genai.GenerativeModel("gemini-2.0-flash")
+                response = model.generate_content(prompt)
+                if response and getattr(response, "candidates", None):
+                    text = response.candidates[0].content.parts[0].text.strip()
+                    # strip code fences
+                    text = re.sub(r"```(?:json)?", "", text).strip()
+                    try:
+                        return json.loads(text)
+                    except Exception:
+                        return {"error": "LLM returned non-JSON or invalid JSON", "raw": text}
+                return {"error": "No response from LLM"}
+            except Exception as e:
+                return {"error": f"Exception calling LLM: {str(e)}"}
         else:
-            # Demo fallback — return a minimal invoice JSON so API works without keys
+            # fallback demo invoice
             return {
                 "invoice": {
                     "invoiceNumber": f"INV-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
                     "issueDate": datetime.utcnow().strftime("%Y-%m-%d"),
                     "dueDate": datetime.utcnow().strftime("%Y-%m-%d"),
-                    "issuer_info": {"name": "Demo Issuer", "contact": "", "address": "", "email": ""},
-                    "client": {"name": "Demo Client", "contact": "", "address": "", "email": ""},
+                    "issuer_info": {"name": "Demo Issuer"},
+                    "client": {"name": "Demo Client"},
                     "serviceDetails": [{"description": transcript[:80], "quantity": 1, "unitPrice": 100.0, "totalPrice": 100.0}],
                     "shipping_cost": 0.0,
                     "vatAmount": 0,
@@ -128,9 +145,9 @@ def generate_invoice(transcript):
                 }
             }
     except Exception as e:
-        return {"error": f"Exception in generate_invoice: {str(e)}"}
+        return {"error": f"generate_invoice exception: {str(e)}"}
 
-# PDF generation (kept largely as your existing implementation but simplified a bit)
+# PDF generation (ReportLab)
 def generate_detailed_pdf(invoice_data):
     try:
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
@@ -138,40 +155,42 @@ def generate_detailed_pdf(invoice_data):
         pdf_path = os.path.join(UPLOAD_FOLDER, pdf_name)
         c = canvas.Canvas(pdf_path, pagesize=letter)
         width, height = letter
-        left_margin = 50
-        top_margin = height - 50
+        left = 50
+        y = height - 60
 
-        c.setFont("Helvetica-Bold", 24)
-        c.drawString(left_margin, top_margin, "INVOICE")
-        current_y = top_margin - 50
+        c.setFont("Helvetica-Bold", 20)
+        c.drawString(left, y, "INVOICE")
+        y -= 30
 
         issuer = invoice_data.get("invoice", {}).get("issuer_info", {})
         client = invoice_data.get("invoice", {}).get("client", {})
 
         c.setFont("Helvetica", 11)
-        c.drawString(left_margin, current_y, f"Issuer: {issuer.get('name','')}")
-        current_y -= 18
-        c.drawString(left_margin, current_y, f"Client: {client.get('name','')}")
-        current_y -= 30
+        c.drawString(left, y, f"Issuer: {issuer.get('name', '')}")
+        y -= 16
+        c.drawString(left, y, f"Client: {client.get('name', '')}")
+        y -= 24
 
-        # services
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(left_margin, current_y, "Description")
-        c.drawString(left_margin + 320, current_y, "Total")
-        current_y -= 18
+        c.drawString(left, y, "Description")
+        c.drawRightString(left + 420, y, "Total")
+        y -= 16
         c.setFont("Helvetica", 11)
-        subtotal = 0.0
-        for s in invoice_data.get("invoice", {}).get("serviceDetails", []):
-            desc = s.get("description", "")
-            total = safe_float(s.get("totalPrice", 0))
-            c.drawString(left_margin, current_y, desc[:60])
-            c.drawRightString(left_margin + 420, current_y, f"{total:.2f}")
-            current_y -= 16
-            subtotal += total
 
-        # summary
-        current_y -= 18
-        c.drawRightString(left_margin + 420, current_y, f"Subtotal: {subtotal:.2f}")
+        subtotal = 0.0
+        for item in invoice_data.get("invoice", {}).get("serviceDetails", []):
+            desc = item.get("description", "")[:80]
+            total = safe_float(item.get("totalPrice", 0))
+            c.drawString(left, y, desc)
+            c.drawRightString(left + 420, y, f"{total:.2f}")
+            y -= 14
+            subtotal += total
+            if y < 100:
+                c.showPage()
+                y = height - 60
+
+        y -= 10
+        c.drawRightString(left + 420, y, f"Subtotal: {subtotal:.2f}")
         c.showPage()
         c.save()
         return pdf_path
@@ -179,66 +198,55 @@ def generate_detailed_pdf(invoice_data):
         print("PDF generation error:", e)
         return ""
 
-# ------------------- Auth wrapper (Clerk) -------------------
-def require_auth(func):
+# ---------- Auth decorator ----------
+def require_auth(f):
+    @wraps(f)
     def wrapper(*args, **kwargs):
         auth_header = request.headers.get("Authorization", "")
         if not auth_header or not auth_header.startswith("Bearer "):
             return jsonify({"error": "Missing Authorization header"}), 401
         token = auth_header.split(" ", 1)[1]
-        # If clerk object available, try verifying; otherwise accept token format only (you can extend)
         if clerk:
             try:
                 session = clerk.sessions.verify_session(token)
                 request.user = session.get("user_id")
-                return func(*args, **kwargs)
+                return f(*args, **kwargs)
             except Exception as e:
-                return jsonify({"error": f"Auth error: {str(e)}"}), 401
+                return jsonify({"error": f"Auth verification failed: {str(e)}"}), 401
         else:
-            # fallback — let token pass (but you may reject in production)
             request.user = None
-            return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__
+            return f(*args, **kwargs)
     return wrapper
 
-# ------------------- Routes (API only) -------------------
-
+# ---------- Routes (API only) ----------
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"ok": True, "ts": datetime.utcnow().isoformat()})
 
-# Frontend pages should be served by Firebase hosting.
-# Redirects here will send user to Firebase page if they accidentally hit Cloud Run UI routes.
+# Info routes (do NOT redirect; frontend served by Firebase)
 @app.route("/", methods=["GET"])
-def root_redirect():
-    if FIREBASE_HOSTING_URL:
-        return redirect(FIREBASE_HOSTING_URL + "/")
-    return jsonify({"message": "Backend running. Set FIREBASE_HOSTING_URL env var to redirect to frontend."})
+def root_info():
+    return jsonify({"message": "Cloud Run backend (API-only). Serve UI from Firebase hosting."})
 
 @app.route("/invoice_tool", methods=["GET"])
-def invoice_tool_redirect():
-    if FIREBASE_HOSTING_URL:
-        return redirect(FIREBASE_HOSTING_URL + "/tool.html")
-    return jsonify({"message": "Use frontend to open the invoice tool."})
+def invoice_tool_info():
+    return jsonify({"message": "Open the tool on Firebase hosting: /invoice_tool (tool.html)"})
+
 
 @app.route("/pricing", methods=["GET"])
-def pricing_redirect():
-    if FIREBASE_HOSTING_URL:
-        return redirect(FIREBASE_HOSTING_URL + "/pricing.html")
-    return jsonify({"message": "Pricing route. Frontend should serve this."})
+def pricing_info():
+    return jsonify({"message": "Pricing page should be served by frontend (Firebase)."})
+
 
 @app.route("/contact", methods=["GET"])
-def contact_redirect():
-    if FIREBASE_HOSTING_URL:
-        return redirect(FIREBASE_HOSTING_URL + "/contact.html")
-    return jsonify({"message": "Contact route. Frontend should serve this."})
+def contact_info():
+    return jsonify({"message": "Contact page served by frontend."})
 
 @app.route("/protected", methods=["GET"])
 @require_auth
-def protected():
-    return jsonify({"message": "You are authenticated", "user_id": getattr(request, "user", None)})
+def protected_route():
+    return jsonify({"message": "Authenticated", "user_id": getattr(request, "user", None)})
 
-# Upload audio (file key may be 'audio' or 'file')
 @app.route("/upload_audio", methods=["POST"])
 def upload_audio_route():
     try:
@@ -247,18 +255,12 @@ def upload_audio_route():
             f = request.files["audio"]
         elif "file" in request.files:
             f = request.files["file"]
-
         if not f:
             return jsonify({"error": "No file uploaded"}), 400
-
-        filename = f.filename or f"audio_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.mp3"
-        save_path = os.path.join(UPLOAD_FOLDER, filename)
-        f.save(save_path)
-
+        save_path = save_uploaded_file(f)
         transcript = get_transcript(save_path)
         if isinstance(transcript, str) and transcript.startswith("Error"):
             return jsonify({"error": transcript}), 500
-
         invoice_json = generate_invoice(transcript)
         return jsonify({"ok": True, "transcript": transcript, "invoice": invoice_json})
     except Exception as e:
@@ -266,7 +268,6 @@ def upload_audio_route():
         print(tb)
         return jsonify({"error": str(e), "trace": tb.splitlines()[-6:]}), 500
 
-# Generate from text (accept JSON or form)
 @app.route("/generate_invoice_text", methods=["POST"])
 def generate_invoice_text_route():
     try:
@@ -284,7 +285,6 @@ def generate_invoice_text_route():
         print(tb)
         return jsonify({"error": str(e), "trace": tb.splitlines()[-6:]}), 500
 
-# Submit contact (email)
 @app.route("/submit-contact", methods=["POST"])
 def submit_contact_route():
     try:
@@ -295,7 +295,7 @@ def submit_contact_route():
         if not name or not email or not message:
             return jsonify({"error": "name, email and message required"}), 400
 
-        # If EMAIL creds exist, try sending email (kept simple)
+        # attempt to send email if credentials provided
         if EMAIL_ADDRESS and APP_PASSWORD:
             try:
                 from email.mime.multipart import MIMEMultipart
@@ -315,9 +315,8 @@ def submit_contact_route():
                 server.quit()
             except Exception as e:
                 print("Email send error:", e)
-                # continue and still return success (or return error if you prefer)
         else:
-            print("Email creds not set — skipping send (contact payload):", data)
+            print("Email creds not set — skipping send (contact):", data)
 
         return jsonify({"ok": True, "message": "Contact received."})
     except Exception as e:
@@ -325,7 +324,6 @@ def submit_contact_route():
         print(tb)
         return jsonify({"error": str(e)}), 500
 
-# Save invoice: accepts form or JSON, saves JSON, generates PDF, returns download URL
 @app.route("/save_invoice", methods=["POST"])
 def save_invoice_route():
     try:
@@ -342,7 +340,6 @@ def save_invoice_route():
             return jsonify({"error": "PDF generation failed"}), 500
 
         pdf_name = Path(pdf_path).name
-        # Return path that frontend can fetch: using relative download endpoint (will be proxied by firebase if configured)
         return jsonify({"ok": True, "pdf_filename": pdf_name, "download_url": f"/download_pdf/{pdf_name}"})
     except Exception as e:
         tb = traceback.format_exc()
@@ -361,7 +358,7 @@ def download_pdf(filename):
         print(tb)
         return jsonify({"error": str(e)}), 500
 
-# Global exception handler — helpful for Cloud Run debugging
+# Global exception handler
 @app.errorhandler(Exception)
 def handle_all_exceptions(e):
     tb = traceback.format_exc()
