@@ -9,3 +9,4 @@ langchain
 clerk-backend-api
 gunicorn
 supabase
+flask-cors
