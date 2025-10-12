@@ -347,47 +347,48 @@
   <!-- Navbar -->
   <header>
     <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
-    <div class="container">
-      <!-- LEFT: Stylish Text Logo -->
-      <a class="navbar-brand stylish-logo" href="/index.html">InvoCue</a>
+      <div class="container">
+        <!-- LEFT: Stylish Text Logo -->
+        <a class="navbar-brand stylish-logo" href="{{ url_for('index') }}">InvoCue</a>
 
-      <!-- Hamburger for mobile -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+        <!-- Hamburger for mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <!-- Center and Right Sections -->
-      <div class="collapse navbar-collapse" id="mainNavbar">
-        <!-- Center Nav Items -->
-        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
-          <li class="nav-item">
-            <a class="nav-link nav-underline" href="/index.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link nav-underline" href="javascript:void(0)" onclick="goToTool(event)">Generate Invoice</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link nav-underline" href="/pricing.html">Pricing</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link nav-underline" href="/contact.html">Contact us</a>
-          </li>
-          <li class="nav-item">
-            <a class="btn btn-primary px-4 ms-lg-3 get-started-btn" href="javascript:void(0)" onclick="goToTool(event)">
-              Get Started Free
-            </a>
-          </li>
-        </ul>
+        <!-- Center and Right Sections -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <!-- Center Nav Items -->
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
+            <li class="nav-item">
+              <a class="nav-link nav-underline" href="{{ url_for('index') }}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-underline" href="javascript:void(0)" onclick="goToTool(event)">Generate Invoice</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-underline" href="{{ url_for('pricing') }}">Pricing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-underline" href="{{ url_for('contact') }}">Contact us</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-primary px-4 ms-lg-3 get-started-btn" href="javascript:void(0)"
+                onclick="goToTool(event)">
+                Get Started Free
+              </a>
+            </li>
+          </ul>
 
-        <!-- Right Auth Buttons -->
-        <div class="d-flex align-items-center gap-2 ms-lg-3" id="auth-buttons">
-          <a class="btn btn-outline-secondary" href="#">Sign In</a>
-          <a class="btn btn-success ms-1" href="#">Sign Up</a>
+          <!-- Right Auth Buttons -->
+          <div class="d-flex align-items-center gap-2 ms-lg-3" id="auth-buttons">
+            <a class="btn btn-outline-secondary" href="#">Sign In</a>
+            <a class="btn btn-success ms-1" href="#">Sign Up</a>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
   </header>
 
 
@@ -615,7 +616,7 @@
     data-clerk-publishable-key="pk_test_ZGFzaGluZy1wZXJjaC05Ni5jbGVyay5hY2NvdW50cy5kZXYk"
     src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js">
     </script>
-  <script src="/static/script.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
   
 
 <script>
