@@ -89,7 +89,6 @@
      /* Input container box */
     .input-container {
      /* padding: 20px 20px 3px 20px; */
-     width: 800px;
      margin-top: 70px;
       border: 1px solid var(--border);
       border-radius: 1rem;
@@ -521,7 +520,6 @@ box-shadow: 0 0 25px rgba(109, 92, 255, 0.2), 0 0 40px rgba(0, 212, 255, 0.1);
     /* Payment Status Toggle Styling */
     .payment-status-wrapper {
         margin-top: 7px;
-        width: 220px;
     }
     
     .payment-status-toggle {
@@ -823,31 +821,6 @@ background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
     }
     
 
-    /* usage notice styles  */
-
-.tool-note {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #b0b8c1;
-  font-weight: 400;
-  margin-top: 12px;
-  letter-spacing: 0.3px;
-}
-
-.tool-note .highlight {
-  color: #00c6ff;  /* subtle neon blue */
-  font-weight: 500;
-}
-
-.tool-note .upgrade {
-  color: #b57bff;  /* soft purple accent */
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-
-
   </style>
 </head>
 <body >
@@ -857,7 +830,7 @@ background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
   <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
     <div class="container">
       <!-- LEFT: Stylish Text Logo -->
-      <a class="navbar-brand stylish-logo" href="{{ url_for('index') }}">InvoCue</a>
+      <a class="navbar-brand stylish-logo" href="{{ url_for('index') }}">InvoiceGen</a>
 
       <!-- Hamburger for mobile -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
@@ -907,8 +880,6 @@ background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
     </div>
   </div>
 
- 
-
 
   <div class="container-box">
        
@@ -945,12 +916,6 @@ background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
 
         </div>
       </div>
-       <!-- Usage Notice -->
-<p class="tool-note">
-  ⚡ You can create up to <span class="highlight">3 free invoices</span> at a time. 
-  <a href="/pricing" class="upgrade">Upgrade anytime for unlimited access</a>.
-</p>
-
     
       <!-- Text Input Section -->
       <div id="textInput" class="input-section d-none  ">
@@ -963,56 +928,6 @@ background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
       </div>
     </div>
     
-    <!-- Upgrade Modal -->
-<div class="modal fade" id="upgradeModal" tabindex="-1" aria-labelledby="upgradeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center border-0 shadow-lg" 
-         style="border-radius: 22px; background: linear-gradient(145deg, #f9fafb, #f1f5f9); color: #0f172a;">
-      
-      <div class="modal-body p-5">
-        
-        <!-- Icon section -->
-        <div class="d-flex justify-content-center align-items-center mb-3">
-          <i class="bi bi-stars fs-1" style="color: #6366f1;"></i>
-        </div>
-        
-        <!-- Heading -->
-        <h3 class="fw-bold mb-3" 
-            style="background: linear-gradient(90deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-          You’re Just One Step Away 🚀
-        </h3>
-        
-        <!-- Subheading / Hook text -->
-        <p class="text-secondary mb-4" style="font-size: 1.05rem;">
-          You’ve reached your free limit of <strong>3 invoices</strong> — but you’re clearly building momentum!  
-          <br><span class="text-dark fw-semibold">Upgrade now to unlock unlimited invoices, faster generation, and premium features.</span>
-        </p>
-        
-        <!-- Benefits Section -->
-        <div class="text-start mx-auto mb-4" style="max-width: 320px;">
-          <ul class="list-unstyled mb-0" style="font-size: 0.95rem;">
-            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Unlimited invoice generation</li>
-            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> AI-powered accuracy boost</li>
-            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Priority processing speed</li>
-          </ul>
-        </div>
-        
-        <!-- CTA button -->
-        <a href="/pricing" 
-           class="btn btn-gradient rounded-pill px-5 py-2 fw-semibold shadow-sm" 
-           style="background: linear-gradient(90deg, #2563eb, #7c3aed); border: none; color: #fff; transition: all 0.3s ease;">
-          Unlock Pro Access
-        </a>
-        
-        <!-- Trust / Subtle closing text -->
-        <p class="mt-3 mb-0 text-muted" style="font-size: 0.9rem;">
-          No hidden fees • Cancel anytime • 24/7 support
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
     
     <!-- Review Form Section -->
     <div id="invoiceFormDiv" class="input-container" style="display: none;">
@@ -1298,7 +1213,7 @@ background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
       <div class="row gy-4">
         <!-- About -->
         <div class="col-lg-4 col-md-6">
-          <a href="{{ url_for('index') }}" class="footer-logo">InvoCue</a>
+          <a href="{{ url_for('index') }}" class="footer-logo">InvoiceGen</a>
           <p class="mt-3">
             Your AI-powered invoice generator.<br>
             <i class="bi bi-check-circle"></i> Create invoices in seconds<br>
@@ -1339,7 +1254,7 @@ background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
       </div>
       <hr class="mt-4 mb-3">
       <div class="text-center">
-        <p class="mb-0">&copy; 2025 InvoCue. All rights reserved.</p>
+        <p class="mb-0">&copy; 2025 InvoiceGen. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -1516,12 +1431,6 @@ floatingMic.addEventListener('click', toggleRecording);
 
 // Function to start recording
 async function startRecording() {
-
-  // 🧩 1. Check if user is allowed to create more invoices
-  if (!canGenerateInvoice()) {
-    return; // stop here if limit reached
-  }
-
   // Disable the record button and enable the stop button
   recordButton.disabled = true;
   stopButton.disabled = false;
@@ -1549,8 +1458,6 @@ async function startRecording() {
     let result = await response.json();
     hideLoader(); 
         if (result.invoice_content) {
-          // 🧩 2. Count this invoice only if success
-          incrementInvoiceCount();
           populateInvoiceForm(result.invoice_content.invoice);
         } else {
           alert("Error: " + (result.error || "Unknown error"));
@@ -1737,31 +1644,24 @@ function drawVisualizer(canvasContext) {
 
     // Text invoice input logic.
     document.getElementById('generateTextBtn').addEventListener('click', async () => {
-  if (!canGenerateInvoice()) return;
-
-  const invoiceText = document.getElementById('invoiceText').value.trim();
-  if (!invoiceText) {
-    alert("Please enter invoice details.");
-    return;
-  }
-
-  showLoader("Generating invoice from text...");
-  let formData = new FormData();
-  formData.append('invoiceText', invoiceText);
-
-  const response = await fetch('/generate_invoice_text', { method: 'POST', body: formData });
-  const result = await response.json();
-  hideLoader();
-
-  if (result.invoice_content) {
-    incrementInvoiceCount();
-    populateInvoiceForm(result.invoice_content.invoice);
-  } else {
-    alert("Error generating invoice from text: " + (result.error || "Unknown error"));
-  }
-});
-
-    // Function to populate the invoice form with data
+      const invoiceText = document.getElementById('invoiceText').value.trim();
+      if (!invoiceText) {
+        alert("Please enter invoice details.");
+        return;
+      }
+      showLoader("Generating invoice from text...");
+      let formData = new FormData();
+      formData.append('invoiceText', invoiceText);
+      const response = await fetch('/generate_invoice_text', { method: 'POST', body: formData });
+      const result = await response.json();
+      hideLoader();
+      if(result.invoice_content){
+         populateInvoiceForm(result.invoice_content.invoice);
+      } else {
+         alert("Error generating invoice from text: " + (result.error || "Unknown error"));
+      }
+    });
+  
     function populateInvoiceForm(invoice) {
       document.getElementById('invoiceFormDiv').style.display = 'block';
       // Enable scrolling when the form is open
@@ -1994,38 +1894,6 @@ collapseTaxAmount.addEventListener('hide.bs.collapse', function () {
     });
 
     
-    // 🧠 Track invoice count
-  function incrementInvoiceCount() {
-    let count = parseInt(localStorage.getItem("invoiceCount")) || 0;
-    count++;
-    localStorage.setItem("invoiceCount", count);
-    return count;
-  }
-
-  function canGenerateInvoice() {
-    let count = parseInt(localStorage.getItem("invoiceCount")) || 0;
-    if (count >= 3) {
-      showUpgradeMessage();
-      return false;
-    }
-    return true;
-  }
-
-  function showUpgradeMessage() {
-    const modal = new bootstrap.Modal(document.getElementById("upgradeModal"));
-    modal.show();
-  }
-
-  async function handleInvoiceCreation(callback) {
-    if (!canGenerateInvoice()) return;
-    incrementInvoiceCount();
-    // 👇 run whichever function actually generates your invoice
-    await callback();
-  }
-
-  // 🧹 for testing: reset counter
-  // localStorage.removeItem("invoiceCount");
-
   </script>
 </body>
 </html>
