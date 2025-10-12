@@ -170,7 +170,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  
   // Contact page
 document.addEventListener("DOMContentLoaded", function () {
   const contactFormContainer = document.querySelector(".contact-form");
