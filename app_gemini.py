@@ -289,8 +289,8 @@ def save_invoice():
 # For debugging clarity
         print(f"✅ PDF Generated: {pdf_filename}")
 
-# Absolute redirect (not relative)
-        preview_url = f"/invoice_preview?pdf_filename={pdf_filename}"
+        cloud_run_base = "https://cloud-run-invoice-gen-1000346396091.europe-west1.run.app"
+        preview_url = f"{cloud_run_base}/invoice_preview?pdf_filename={pdf_filename}"
         return redirect(preview_url)
 
     except Exception as e:
