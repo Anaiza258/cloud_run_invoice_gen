@@ -16,7 +16,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from clerk_backend_api import Clerk
-from flask_cors import CORS
 
 
 # Load environment variables
@@ -33,11 +32,6 @@ clerk = Clerk(os.getenv("CLERK_SECRET_KEY"))
 
 # Flask setup and ensure upload folder exists
 app = Flask(__name__)
-
-
-# Allow Firebase origin
-CORS(app, resources={r"/*": {"origins": ["https://invocue-ai-invoice-generator.web.app"]}})
-
 
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -286,11 +280,7 @@ def save_invoice():
 
         pdf_path = generate_detailed_pdf(invoice_data)
         print("Generated PDF path:", pdf_path)  # Debug print
-        pdf_filename = os.path.basename(pdf_path)
-        pdf_preview_url = f"/invoice_preview?pdf_filename={pdf_filename}"
-        return jsonify({"success": True, "pdf_preview_url": pdf_preview_url})
-
-
+        return redirect(url_for('invoice_preview', pdf_filename=os.path.basename(pdf_path)))
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
 

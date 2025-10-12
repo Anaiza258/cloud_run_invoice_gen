@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Invoice Generator | Free & Pro Plans</title>
+<meta name="description" content="AI-powered voice-to-invoice generator for freelancers, startups, and businesses. Create invoices in seconds with AI.">
+<meta name="keywords" content="AI invoice generator, voice to invoice, invoice automation, free invoice tool, free invoice generator, ">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+
+
+  <style>
+    :root {
+      --grid-gap: 40px;
+      /* distance between grid lines */
+      --grid-alpha: 0.06;
+      --nav-height: 72px;
+    }
+
+    /* body  */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+
+      background-image:
+        repeating-linear-gradient(0deg,
+          rgba(255, 255, 255, var(--grid-alpha)) 0,
+          rgba(255, 255, 255, var(--grid-alpha)) 1px,
+          transparent 1px,
+          transparent var(--grid-gap)),
+        repeating-linear-gradient(90deg,
+          rgba(255, 255, 255, var(--grid-alpha)) 0,
+          rgba(255, 255, 255, var(--grid-alpha)) 1px,
+          transparent 1px,
+          transparent var(--grid-gap)),
+        
+        radial-gradient(circle at 30% 80%, rgba(0, 212, 255, 0.22) 12%, transparent 60%),
+        radial-gradient(circle at 75% 25%, rgba(109, 92, 255, 0.22) 8%, transparent 50%),
+        linear-gradient(160deg, #121520, #20283a 50%, #1a1f2e);
+
+
+      /* Keep everything fixed while scrolling */
+      background-attachment: fixed, fixed, fixed, fixed, fixed;
+      /* Center the layers for consistency */
+      background-position: center, center, center, center, center;
+      /* push page content down so it's not hidden by fixed navbar */
+      padding-top: var(--nav-height);
+
+
+    }
+
+    /* nav bar  */
+    .stylish-logo {
+      font-size: 2rem;
+background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .navbar-custom,
+    .navbar-custom .nav-link,
+    .navbar-custom .btn-outline-secondary {
+      color: #fff !important;
+      font-size: 17px;
+    }
+
+    /* Get Started Button */
+    .get-started-btn {
+      font-weight: 600;
+      border-radius: 2rem;
+      background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+      color: #fff !important;
+      box-shadow: 0 2px 8px rgba(67, 206, 162, 0.1);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .get-started-btn:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 4px 16px rgba(67, 206, 162, 0.18);
+      color: #fff !important;
+    }
+
+    /* nav bar  */
+    .navbar-custom {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--nav-height);
+      z-index: 40;
+      background: linear-gradient(180deg, rgba(30, 34, 46, 0.18), rgba(30, 34, 46, 0.08));
+      backdrop-filter: blur(8px) saturate(120%);
+      -webkit-backdrop-filter: blur(8px) saturate(120%);
+
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background .18s ease, transform .18s ease;
+    }
+
+   /* Nav Underline Effect */
+.nav-underline {
+  position: relative;
+  color: #fff !important;
+  transition: color 0.25s ease;
+}
+
+/* Hover + Active underline */
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px; 
+  height: 3px;
+  background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Show underline only when active or hovered */
+.nav-underline:hover::after,
+.nav-underline.active::after {
+  transform: scaleX(1);
+}
+
+/* Active link color */
+.nav-underline.active {
+  color: #43cea2 !important; 
+  font-weight: 600; 
+}
+
+
+    @media (max-width: 991.98px) {
+      .navbar-nav {
+        gap: 0 !important;
+      }
+
+      .get-started-btn {
+        margin-left: 0 !important;
+        margin-top: 0.5rem;
+      }
+
+      .d-flex.align-items-center {
+        margin-top: 0.5rem;
+      }
+    }
+
+    /* Hero section */
+    .intro-section {
+      min-height: 75vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+    }
+
+    /* Big headline text */
+    .typewriter {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 6vw, 4.8rem);
+      line-height: 1.15;
+      background: linear-gradient(90deg,
+          #00f5a0 0%,
+          #00d9f5 25%,
+          #007cf0 55%,
+          #7928ca 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+      margin: 0.4rem 0;
+      position: relative;
+      text-shadow: 0 4px 16px rgba(0, 217, 245, 0.25);
+    }
+
+    /* Cursor */
+    .typewriter.finished::after {
+      content: "|";
+      position: absolute;
+      right: -16px;
+      font-weight: 900;
+      font-size: 2.6rem;
+      color: #00e1ff;
+      text-shadow: 0 0 8px rgba(0, 217, 245, 0.7);
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      50% {
+        opacity: 1;
+      }
+
+      51%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* invoice Showcase Section */
+    .showcase-section {
+      padding: 4rem 1rem;
+    }
+
+    .showcase-text {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 600;
+      font-size: clamp(2rem, 2.8vw, 2.6rem);
+      line-height: 1.3;
+      color: #f1f5f9;
+      margin-bottom: 1.5rem;
+    }
+
+    .showcase-text strong {
+      background: linear-gradient(90deg, #00f5a0, #00d9f5, #007cf0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .showcase-subtext {
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: #cbd5e1;
+      max-width: 520px;
+    }
+
+    /* Image Card */
+    .preview-card {
+      background: #1e2533;
+      border-radius: 1rem;
+      overflow: hidden;
+      width: 80%;
+      margin: 0 auto;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.66), 0 0 25px rgba(0, 200, 255, 0.381);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .preview-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.4), 0 0 35px rgba(0, 200, 255, 0.18);
+    }
+
+
+    .preview-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .generate-btn {
+  font-weight: 700;
+  border-radius: 2.5rem;
+  background: linear-gradient(90deg, #ff3cff, #7a3cff);
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(122, 60, 255, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.generate-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(122, 60, 255, 0.55);
+  color: #fff;
+}
+
+
+    /* Features Section */
+
+    .features-heading {
+      font-family: "Roboto", sans-serif;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 800;
+  background: linear-gradient(90deg, #00f5a0, #00d9f5, #7928ca);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.features-subtext {
+  font-size: 1.1rem;
+  color: #cbd5e1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.feature-steps {
+  position: relative;
+  margin-top: 3rem;
+}
+
+.feature-steps .line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #00f5a0, #007cf0);
+  transform: translateX(-50%);
+  border-radius: 4px;
+}
+
+.feature-step {
+  width: 50%;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+.feature-step.left { text-align: right; left: 0; }
+.feature-step.right { text-align: left; left: 50%; }
+
+.feature-card {
+  padding: 2rem;
+  border-radius: 1.2rem;
+  background: #f9fafbf3;
+  color: #0f172a; 
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* Titles inside card */
+.feature-card h5 {
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.6rem;
+}
+
+/* Paragraph */
+.feature-card p {
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+/* Icon */
+.feature-icon {
+  font-size: 2.4rem;
+  background: linear-gradient(90deg, #00f5a0, #007cf0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 992px) {
+  .feature-step, .feature-step.left, .feature-step.right {
+    width: 100%;
+    text-align: center;
+    left: 0 !important;
+  }
+  .feature-steps .line { display: none; }
+}
+
+
+    /* FAQ Section */
+    .faq-section {
+      padding: 6rem 1rem;
+      background-color: rgba(163, 169, 182, 0.564);
+    }
+
+    .faq-heading {
+      font-size: clamp(2rem, 3.9vw, 2.9rem);
+      font-weight: 800;
+      color: #fff;
+    }
+
+
+    .faq-subtext {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    /* Accordion styling */
+    .faq-item {
+      background: rgba(45, 68, 100, 0.61);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .faq-btn {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #f1f5f9;
+      background: transparent;
+      box-shadow: none;
+      transition: all 0.3s ease;
+    }
+
+    .faq-btn:focus {
+      box-shadow: none;
+    }
+
+    .faq-btn:not(.collapsed) {
+      background: linear-gradient(90deg, rgba(0, 245, 160, 0.1), rgba(121, 40, 202, 0.1));
+      color: #00d9f5;
+    }
+
+    .accordion-body {
+      font-size: 1rem;
+      color: #cbd5e1;
+      padding: 1rem 1.25rem;
+      line-height: 1.6;
+      margin-top: 2rem;
+    }
+
+
+ /* text cluster animation  */
+    .cluster {
+      margin-left: 1rem;
+      margin-right: 1rem;
+      --size: min(300px, 70vw);
+      /* smaller size */
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      position: relative;
+      display: block;
+      overflow: visible;
+      isolation: isolate;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 12px 28px rgba(2, 8, 25, 0.55), 0 0 18px rgba(0, 200, 255, 0.08);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.005));
+      padding: 0.5rem;
+    }
+
+
+    .cluster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(0, 245, 160, 0.04), transparent 18%),
+        radial-gradient(circle at 75% 70%, rgba(121, 40, 202, 0.04), transparent 20%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .cluster .bg-word {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Roboto', sans-serif;
+      font-weight: 900;
+      font-size: calc(var(--size) * 0.28);
+      color: rgba(255, 255, 255, 0.04);
+      letter-spacing: -0.02em;
+      user-select: none;
+      pointer-events: none;
+      filter: blur(0.6px);
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    .cluster .words {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+
+    /* Words */
+    .word {
+      --tx: 0px;
+      --ty: 0px;
+      --rot: 0deg;
+      --scale: 1;
+      position: absolute;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 900;
+      line-height: 0.85;
+      font-size: clamp(20px, 5vw, 42px);
+      /* smaller font */
+      background: linear-gradient(90deg, #00f5a0, #00d9f5, #7b2cf0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: screen;
+      text-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+      transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--scale));
+      transition: transform .3s cubic-bezier(.2, .9, .2, 1), opacity .25s;
+      opacity: .95;
+      white-space: nowrap;
+    }
+
+    /* Position words closer inside */
+    .word.w1 {
+      top: 12%;
+      left: 22%;
+      --rot: -10deg;
+      font-size: clamp(22px, 5vw, 44px);
+    }
+
+    .word.w2 {
+      top: 30%;
+      left: 55%;
+      --rot: 8deg;
+    }
+
+    .word.w3 {
+      top: 55%;
+      left: 25%;
+      --rot: -12deg;
+    }
+
+    .word.w4 {
+      top: 62%;
+      left: 48%;
+      --rot: 6deg;
+    }
+
+    .word.w5 {
+      top: 20%;
+      left: 65%;
+      --rot: -4deg;
+    }
+
+    /* Softer float animation */
+    .word {
+      animation: float 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1);
+      }
+
+      100% {
+        transform: translate(calc(var(--tx) - 4px), calc(var(--ty) - 6px)) rotate(calc(var(--rot) + 1deg)) scale(1.02);
+      }
+    }
+
+    .cluster:hover .word {
+      transition-duration: .18s;
+    }
+
+    /* Responsive behaviour: stack on small screens (heading stays on top) */
+    @media (max-width: 991.98px) {
+      .cluster {
+        --size: min(340px, 66vw);
+        margin-top: 1rem;
+      }
+
+      .faq-section {
+        padding: 3.5rem 1rem;
+      }
+
+      .faq-right {
+        padding-left: 0;
+        padding-right: 0;
+        margin-top: 1rem;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .word {
+        font-size: clamp(20px, 8vw, 44px);
+      }
+
+      .cluster .bg-word {
+        font-size: calc(var(--size) * 0.30);
+      }
+    }
+
+   /* ===== Footer Section ===== */
+.footer {
+  background: linear-gradient(180deg, rgba(18, 21, 32, 0.97), rgba(26, 31, 46, 0.98));
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.footer-logo {
+  font-size: 1.6rem;
+  font-weight: 800;
+background: linear-gradient(90deg, #61c0ff 0%, #ff3cff 100%);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+.footer p {
+  margin: 0;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.footer h6 {
+  color: #e2e8f0;
+  font-size: 1rem;
+}
+
+.footer ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.footer ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer ul li a {
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-weight: 500;
+}
+
+.footer ul li a:hover {
+  color: #00d9f5;
+}
+
+.footer .social-icons a {
+  display: inline-block;
+  margin-right: 0.6rem;
+  font-size: 1.25rem;
+  color: #cbd5e1;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.footer .social-icons a:hover {
+  color: #00f5a0;
+  transform: translateY(-2px);
+}
+
+.footer hr {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+
+  </style>
+</head>
+
+<body>
+
+
+  <!-- Navbar -->
+  <header>
+  <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
+    <div class="container">
+      <!-- LEFT: Stylish Text Logo -->
+      <a class="navbar-brand stylish-logo" href="/index.html">InvoCue</a>
+
+      <!-- Hamburger for mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Center and Right Sections -->
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <!-- Center Nav Items -->
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
+          <li class="nav-item">
+            <a class="nav-link nav-underline" href="/index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-underline" href="javascript:void(0)" onclick="goToTool(event)">Generate Invoice</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-underline" href="/pricing.html">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-underline" href="/contact.html">Contact us</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary px-4 ms-lg-3 get-started-btn" href="javascript:void(0)" onclick="goToTool(event)">
+              Get Started Free
+            </a>
+          </li>
+        </ul>
+
+        <!-- Right Auth Buttons -->
+        <div class="d-flex align-items-center gap-2 ms-lg-3" id="auth-buttons">
+          <a class="btn btn-outline-secondary" href="#">Sign In</a>
+          <a class="btn btn-success ms-1" href="#">Sign Up</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+
+  <section class="intro-section container-fluid d-flex flex-column justify-content-center align-items-center">
+    <div class="row">
+      <div class="col-12 text-center">
+        <h1 class="typewriter" id="line1"></h1>
+        <h1 class="typewriter" id="line2"></h1>
+      </div>
+    </div>
+  </section>
+
+  <!-- image preview section  -->
+  <section class="showcase-section container">
+    <div class="row align-items-center">
+      <!-- Left Text -->
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <h2 class="showcase-text">
+          The simplest way to create professional invoices
+        </h2>
+        <p class="showcase-subtext">
+          With <strong>InvoCue</strong>, you can generate, edit, and share invoices in seconds.
+          Voice-powered commands and AI-driven formatting help you focus on your work, not paperwork.
+        </p>
+
+        <!-- NEW BUTTON -->
+      <a href="#"
+         onclick="goToTool()" 
+         class="btn btn-lg px-5 py-3 mt-3 generate-btn">
+        Generate Your Invoice
+      </a>
+
+      </div>
+
+      <!-- Right Image -->
+      <div class="col-lg-6 text-center">
+        <div class="preview-card mx-auto">
+          <img src="/static\invoice.png" alt="Invoice Preview" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+<section class="features-section container py-5">
+  <div class="text-center mb-5">
+    <h2 class="features-heading">
+      Explore the <span>Power of InvoCue</span>
+    </h2>
+    <p class="features-subtext">
+      From idea to invoice in seconds — a seamless, modern invoicing journey built for freelancers & businesses.
+    </p>
+  </div>
+
+  <div class="feature-steps position-relative">
+    <!-- Connector Line -->
+    <div class="line"></div>
+
+    <!-- Feature 1 -->
+    <div class="feature-step left">
+      <div class="feature-card glass">
+        <i class="bi bi-mic-fill feature-icon"></i>
+        <h5>Voice-Powered Creation</h5>
+        <p>Speak your invoice, and let AI handle the formatting instantly.</p>
+      </div>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="feature-step right">
+      <div class="feature-card glass">
+        <i class="bi bi-pencil-square feature-icon"></i>
+        <h5>Smart Editing</h5>
+        <p>Make quick changes with an elegant editor designed for speed.</p>
+      </div>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="feature-step left">
+      <div class="feature-card glass">
+        <i class="bi bi-file-earmark-arrow-down feature-icon"></i>
+        <h5>Download as PDF</h5>
+        <p>Finalize and export your invoice in a polished PDF instantly.</p>
+      </div>
+    </div>
+
+    <!-- Feature 4 -->
+    <div class="feature-step right">
+      <div class="feature-card glass">
+        <i class="bi bi-collection feature-icon"></i>
+        <h5>Invoice Gallery</h5>
+        <p>All your past invoices organized in one beautiful, searchable space.</p>
+      </div>
+    </div>
+
+    <!-- Feature 5 -->
+    <div class="feature-step left">
+      <div class="feature-card glass">
+        <i class="bi bi-lightning-charge-fill feature-icon"></i>
+        <h5>AI Assistance</h5>
+        <p>Get AI suggestions for missing info, client details, or invoice layout.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <br>
+  <br>
+  <br>
+
+  <!-- FAQ Section -->
+  <section class="faq-section container py-5">
+    <div class="text-center mb-5">
+      <h2 class="faq-heading">Frequently Asked <span>Questions</span></h2>
+      <p class="faq-subtext">Got questions? We’ve got answers — here’s everything you need to know about InvoCue.</p>
+    </div>
+
+    <div class="faq-body row gy-4 align-items-center">
+      <div class="col-lg-6 d-flex justify-content-center">
+        <div class="w-100" style="max-width:520px;">
+          <div class="faq-box p-4">
+            <div class="accordion" id="faqAccordion">
+
+              <!-- Item 1  -->
+              <div class="accordion-item faq-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button faq-btn collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#faq3">
+                    What is an invoice?
+                  </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    An invoice is an itemized bill, issued by anyone selling goods or services. An invoice will detail the agreed prices or fees, and list out the products or services that have been provided. Upon receipt, the buyer will settle the invoice.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="accordion-item faq-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button faq-btn collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#faq1">
+                    How does InvoCue work?
+                  </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    InvoCue uses AI to generate professional invoices instantly based on your voice or text input.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 3 -->
+              <div class="accordion-item faq-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button faq-btn collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#faq2">
+                    Can I edit my invoices?
+                  </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    Yes, you can easily review and edit invoices before downloading or sending them.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 4 -->
+              <div class="accordion-item faq-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button faq-btn collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#faq3">
+                    Is InvoCue free to use?
+                  </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    You can create up to 3 invoices for free. After that, simply upgrade to continue creating more invoices.
+                  </div>
+                </div>
+              </div>
+              <!-- Item 5  -->
+              <div class="accordion-item faq-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button faq-btn collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#faq3">
+                    Can I put my own logo on the invoice?
+                  </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    Yes, our InvoCue lets you add your own company logo. Just select the logo box in the top left corner, and upload your logo or drag and drop it into place. Both JPG and PNG images are supported.
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Item 6  -->
+              <div class="accordion-item faq-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button faq-btn collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#faq3">
+                    How do I send my invoice?
+                  </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    Download your invoice after the invoice is generated, then attach it to an email or message to your client.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Typographic art cluster -->
+      <div class="col-lg-6 d-flex justify-content-center">
+        <div class="cluster" id="typoCluster" aria-hidden="true" title="Typographic brand art">
+          <div class="bg-word">Invoice</div>
+          <div class="words">
+            <span class="word w1">Invoice</span>
+            <span class="word w2">Voice</span>
+            <span class="word w3">Text</span>
+            <span class="word w4">AI</span>
+            <span class="word w5">Fast</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- Footer -->
+<footer class="footer py-5 mt-5">
+  <div class="container">
+    <div class="row gy-4">
+      
+      <!-- About -->
+      <div class="col-lg-4 col-md-6">
+        <a href="#" class="footer-logo">InvoCue</a>
+        <p class="mt-3">
+          Your AI-powered invoice generator.<br>
+          <i class="bi bi-check-circle"></i> Create invoices in seconds<br>
+          <i class="bi bi-check-circle"></i> Voice + AI Assistance<br>
+          <i class="bi bi-check-circle"></i> Export to PDF & Share
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="col-lg-2 col-md-6">
+        <h6 class="fw-bold mb-3">Quick Links</h6>
+        <ul class="list-unstyled">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Pricing</a></li>
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div class="col-lg-3 col-md-6">
+        <h6 class="fw-bold mb-3">Resources</h6>
+        <ul class="list-unstyled">
+          <li><a href="#">Docs</a></li>
+          <li><a href="#">Support</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div class="col-lg-3 col-md-6">
+        <h6 class="fw-bold mb-3">Follow Us</h6>
+        <div class="social-icons">
+          <a href="#"><i class="bi bi-twitter"></i></a>
+          <a href="#"><i class="bi bi-linkedin"></i></a>
+          <a href="#"><i class="bi bi-github"></i></a>
+          <a href="#"><i class="bi bi-facebook"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="mt-4 mb-3">
+
+    <!-- Copy -->
+    <div class="text-center">
+      <p class="mb-0">&copy; 2025 InvoCue. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_ZGFzaGluZy1wZXJjaC05Ni5jbGVyay5hY2NvdW50cy5kZXYk"
+  src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js">
+</script>
+<script src="/static/script.js"></script>
+
+ 
+</body>
+</html>
