@@ -290,11 +290,8 @@ def save_invoice():
         print(f"✅ PDF Generated: {pdf_filename}")
 
 # Absolute redirect (not relative)
-        # Absolute redirect via Firebase domain instead of Cloud Run
-        firebase_host = "https://invocue-ai-invoice-generator.web.app"
-        preview_url = f"{firebase_host}/invoice_preview?pdf_filename={pdf_filename}"
+        preview_url = f"/invoice_preview?pdf_filename={pdf_filename}"
         return redirect(preview_url)
-
 
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
