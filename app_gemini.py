@@ -287,11 +287,10 @@ def save_invoice():
         pdf_filename = os.path.basename(pdf_path)
 
 # For debugging clarity
-        print(f"✅ PDF Generated: {pdf_filename}")
+        preview_url = f"/invoice_preview?pdf_filename={pdf_filename}"
 
-        cloud_run_base = "https://cloud-run-invoice-gen-1000346396091.europe-west1.run.app"
-        preview_url = f"{cloud_run_base}/invoice_preview?pdf_filename={pdf_filename}"
-        return redirect(preview_url)
+        print(f"✅ PDF Generated: {pdf_filename}")
+        return jsonify({"success": True, "preview_url": preview_url})
 
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
