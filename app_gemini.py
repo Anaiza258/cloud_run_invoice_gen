@@ -16,6 +16,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from clerk_backend_api import Clerk
+from flask_cors import CORS
 
 
 # Load environment variables
@@ -32,6 +33,11 @@ clerk = Clerk(os.getenv("CLERK_SECRET_KEY"))
 
 # Flask setup and ensure upload folder exists
 app = Flask(__name__)
+
+
+# Allow Firebase origin
+CORS(app, resources={r"/*": {"origins": ["https://invocue-ai-invoice-generator.web.app"]}})
+
 
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
