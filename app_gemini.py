@@ -286,8 +286,10 @@ def save_invoice():
 
         pdf_path = generate_detailed_pdf(invoice_data)
         print("Generated PDF path:", pdf_path)  # Debug print
-        pdf_url = f"/download_pdf/{os.path.basename(pdf_path)}"
-        return jsonify({"success": True, "pdf_url": pdf_url})
+        pdf_filename = os.path.basename(pdf_path)
+        pdf_preview_url = f"/invoice_preview?pdf_filename={pdf_filename}"
+        return jsonify({"success": True, "pdf_preview_url": pdf_preview_url})
+
 
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
