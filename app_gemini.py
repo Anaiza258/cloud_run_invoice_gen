@@ -287,11 +287,11 @@ def save_invoice():
         pdf_filename = os.path.basename(pdf_path)
 
 # For debugging clarity
-        preview_url = f"/invoice_preview?pdf_filename={pdf_filename}"
-
-        print(f"✅ PDF Generated: {pdf_filename}")
-        return jsonify({"success": True, "preview_url": preview_url})
-
+        
+        firebase_host = "https://invocue-ai-invoice-generator.web.app" 
+        preview_url = f"{firebase_host}/invoice_preview?pdf_filename={pdf_filename}" 
+        return redirect(preview_url)
+    
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
 
