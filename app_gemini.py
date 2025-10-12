@@ -288,7 +288,7 @@ def save_invoice():
 
 # For debugging clarity
         
-        preview_url = f"{pdf_path}/invoice_preview?pdf_filename={pdf_filename}" 
+        preview_url =  f"/invoice_preview?pdf_filename={pdf_filename}"
         return redirect(preview_url)
     
     except Exception as e:
