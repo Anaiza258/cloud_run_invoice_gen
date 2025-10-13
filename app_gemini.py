@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify, redirect, url_for
+from flask import Flask, request, render_template, jsonify, redirect, url_for, send_from_directory
 import os
 import uuid
 import requests
@@ -292,6 +292,18 @@ def save_invoice():
     
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
+
+@app.route("/download_pdf/<filename>")
+def download_pdf(filename):
+    """Serve generated PDF file from uploads folder"""
+    try:
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        if not os.path.exists(file_path):
+            return "File not found", 404
+        return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=False)
+    except Exception as e:
+        return f"Error serving file: {str(e)}", 500
+
 
 @app.route('/invoice_preview')
 def invoice_preview():
