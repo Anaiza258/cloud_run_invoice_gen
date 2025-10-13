@@ -35,6 +35,7 @@ clerk = Clerk(os.getenv("CLERK_SECRET_KEY"))
 app = Flask(__name__)
 
 
+CORS(app, origins=["https://invocue-ai-invoice-generator.web.app"])
 CORS(app, supports_credentials=True)
 
 UPLOAD_FOLDER = "static/uploads"
@@ -286,10 +287,9 @@ def save_invoice():
         
         pdf_filename = os.path.basename(pdf_path)
 
-# For debugging clarity
-        
-        preview_url =  f"/invoice_preview?pdf_filename={pdf_filename}"
-        return redirect(preview_url)
+        cloud_run_url = f"https://cloud-run-invoice-gen-1000346396091.europe-west1.run.app/download_pdf/{pdf_filename}"
+
+        return jsonify({"success": True, "pdf_url": cloud_run_url})
     
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
