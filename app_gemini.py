@@ -296,7 +296,7 @@ def save_invoice():
 
 @app.route('/invoice_preview')
 def invoice_preview():
-    pdf_filename = request.args.get('pdf_filename', '')
+    pdf_filename = request.args.get('cloud_run_url', '')
     return render_template('invoice_preview.html', pdf_filename=pdf_filename)
 
 # get transcript 
