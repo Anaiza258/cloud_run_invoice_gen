@@ -37,8 +37,15 @@ CORS(app, supports_credentials=True)
 
 
 # Initialize Firebase Admin SDK 
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
+firebase_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+
+if firebase_json:
+    cred_dict = json.loads(firebase_json)
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
+else:
+    print(" Firebase credentials not found in environment!")
+
 
 def verify_firebase_token(func):
     def wrapper(*args, **kwargs):
