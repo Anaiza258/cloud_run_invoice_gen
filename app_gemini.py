@@ -15,9 +15,9 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-from clerk_backend_api import Clerk
 from flask_cors import CORS
-
+import firebase_admin
+from firebase_admin import auth, credentials
 
 # Load environment variables
 load_dotenv()
@@ -28,9 +28,6 @@ APP_PASSWORD = os.getenv("APP_PASSWORD")
 
 
 
-# Initialize Clerk
-clerk = Clerk(os.getenv("CLERK_SECRET_KEY"))
-
 # Flask setup and ensure upload folder exists
 app = Flask(__name__)
 
@@ -38,39 +35,38 @@ app = Flask(__name__)
 CORS(app, origins=["https://invocue-ai-invoice-generator.web.app"])
 CORS(app, supports_credentials=True)
 
+
+# Initialize Firebase Admin SDK 
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+
+def verify_firebase_token(func):
+    def wrapper(*args, **kwargs):
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+            return jsonify({"error": "Missing token"}), 401
+        token = auth_header.split(" ")[1]
+        try:
+            decoded_token = auth.verify_id_token(token)
+            request.user = decoded_token
+            return func(*args, **kwargs)
+        except Exception as e:
+            return jsonify({"error": f"Invalid or expired token: {str(e)}"}), 401
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+@app.route("/protected")
+@verify_firebase_token
+def protected():
+    return jsonify({"message": "You are authenticated!", "user": request.user})
+
+
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-# Middleware-like decorator for auth 
-def require_auth(func):
-    def wrapper(*args, **kwargs):
-        auth_header = request.headers.get("Authorization")
-        if not auth_header:
-            return jsonify({"error": "Missing Authorization header"}), 401
-
-        token = auth_header.split(" ")[1]  # Bearer <token>
-
-        try:
-            session = clerk.sessions.verify_session(token)
-            request.user = session["user_id"]  # save user ID
-            return func(*args, **kwargs)
-        except Exception as e:
-            return jsonify({"error": str(e)}), 401
-
-    wrapper.__name__ = func.__name__
-    return wrapper
-
-@app.route("/protected")
-@require_auth
-def protected():
-    return jsonify({
-        "message": "You are logged in!",
-        "user_id": request.user
-    })
 
 
 @app.route('/invoice_tool')
