@@ -291,7 +291,7 @@ def save_invoice():
         pdf_filename = os.path.basename(pdf_path)
 
         cloud_run_url = f"https://cloud-run-invoice-gen-1000346396091.europe-west1.run.app/download_pdf/{pdf_filename}"
-        return jsonify({"success": True, "pdf_filename": pdf_filename})
+        return jsonify({"success": True, "pdf_url": cloud_run_url})
     
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
