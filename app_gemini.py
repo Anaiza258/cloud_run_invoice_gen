@@ -306,8 +306,9 @@ def download_pdf(filename):
 
 @app.route('/invoice_preview')
 def invoice_preview():
-    pdf_url = request.args.get('pdf_url', '')
-    return render_template('invoice_preview.html', pdf_url=pdf_url)
+    pdf_filename = request.args.get('pdf_filename', '')
+    pdf_url = f"/download_pdf/{pdf_filename}"
+    return render_template('invoice_preview.html', pdf_url=pdf_url, pdf_filename=pdf_filename)
 
 # get transcript 
 def get_transcript(audio_path):
