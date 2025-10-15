@@ -291,7 +291,7 @@ def save_invoice():
         pdf_filename = os.path.basename(pdf_path)
 
         cloud_run_url = f"https://cloud-run-invoice-gen-1000346396091.europe-west1.run.app/download_pdf/{pdf_filename}"
-        return jsonify({"success": True, "pdf_url": cloud_run_url})
+        return jsonify({"success": True, "pdf_filename": pdf_filename})
     
     except Exception as e:
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
@@ -310,8 +310,10 @@ def invoice_preview():
     if not pdf_filename:
         return "Missing file name", 400
 
-    # Generate the correct URL to your Flask download route
+    # Build correct absolute URL to the PDF
     pdf_url = url_for('download_pdf', filename=pdf_filename)
+    print("✅ PDF URL:", pdf_url)  # For debugging
+
     return render_template('invoice_preview.html', pdf_url=pdf_url, pdf_filename=pdf_filename)
 
 # get transcript 
