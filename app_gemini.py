@@ -303,7 +303,7 @@ def download_pdf(filename):
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         if not os.path.exists(file_path):
             return "File not found", 404
-        return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+        return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=False)
     except Exception as e:
         return f"Error serving file: {str(e)}", 500
 
