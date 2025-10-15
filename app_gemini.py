@@ -303,7 +303,7 @@ def download_pdf(filename):
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         if not os.path.exists(file_path):
             return "File not found", 404
-        return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=False)
+        return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
     except Exception as e:
         return f"Error serving file: {str(e)}", 500
 
@@ -311,7 +311,8 @@ def download_pdf(filename):
 @app.route('/invoice_preview')
 def invoice_preview():
     pdf_url = request.args.get('pdf_url', '')
-    return render_template('invoice_preview.html', pdf_url=pdf_url)
+    filename = os.path.basename(pdf_url)
+    return render_template('invoice_preview.html', pdf_url=pdf_url, pdf_filename=filename)
 
 # get transcript 
 def get_transcript(audio_path):
