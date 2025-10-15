@@ -306,15 +306,8 @@ def download_pdf(filename):
 
 @app.route('/invoice_preview')
 def invoice_preview():
-    pdf_filename = request.args.get('pdf_filename', '')
-    if not pdf_filename:
-        return "Missing file name", 400
-
-    # Build correct absolute URL to the PDF
-    pdf_url = url_for('download_pdf', filename=pdf_filename)
-    print("✅ PDF URL:", pdf_url)  # For debugging
-
-    return render_template('invoice_preview.html', pdf_url=pdf_url, pdf_filename=pdf_filename)
+    pdf_url = request.args.get('pdf_url', '')
+    return render_template('invoice_preview.html', pdf_url=pdf_url)
 
 # get transcript 
 def get_transcript(audio_path):
