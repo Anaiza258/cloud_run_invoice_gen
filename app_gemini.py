@@ -307,7 +307,11 @@ def download_pdf(filename):
 @app.route('/invoice_preview')
 def invoice_preview():
     pdf_filename = request.args.get('pdf_filename', '')
-    pdf_url = f"/download_pdf/{pdf_filename}"
+    if not pdf_filename:
+        return "Missing file name", 400
+
+    # Generate the correct URL to your Flask download route
+    pdf_url = url_for('download_pdf', filename=pdf_filename)
     return render_template('invoice_preview.html', pdf_url=pdf_url, pdf_filename=pdf_filename)
 
 # get transcript 
